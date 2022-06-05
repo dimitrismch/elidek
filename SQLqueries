@@ -1,0 +1,152 @@
+------------------------------------------------------------------------
+ ------------------------------ 3.1a -------------------------------------
+ ------------------------------------------------------------------------
+
+ /*
+ 
+ SELECT Onoma AS "Onoma Programatos"
+ FROM programma
+ */
+ ------------------------------------------------------------------------
+ ------------------------------ 3.1b ------------------------------------
+ ------------------------------------------------------------------------
+ /*
+ SELECT e.titlos
+ FROM ergo as e
+ INNER JOIN stelexos as s
+ 	ON e.stelexos_id = s.stelexos_id
+ WHERE e.diarkeia = 19 or  e.enarksi = '2012/4/6' or s.onoma = 'The Seven'
+ */
+  ------------------------------------------------------------------------
+ ------------------------------ 3.1c ------------------------------------
+ ------------------------------------------------------------------------
+ /*
+ SELECT r.onoma
+ FROM erevnitis as r
+ INNER JOIN doulevei as d
+ 	ON r.erevnitis_id = d.erevnitis_id
+ WHERE d.ergo_titlos = 'Winterfell'
+ */	
+ 
+  ------------------------------------------------------------------------
+ ------------------------------ 3.2 -------------------------------------
+ ------------------------------------------------------------------------
+ 
+ 
+ ------------------------------------------------------------------------
+ ------------------------------ 3.3a ------------------------------------
+ ------------------------------------------------------------------------
+ /*
+ SELECT p.ergo_titlos as titlos
+ FROM afora_pedio as p
+ WHERE p.epistimoniko_pedio_onoma = 'North'
+ */
+ ------------------------------------------------------------------------
+ ------------------------------ 3.3b ------------------------------------
+ ------------------------------------------------------------------------
+ /*
+ SELECT DISTINCT r.onoma, r.epitheto
+ FROM ergo as e
+ INNER JOIN afora_pedio as f
+ 	ON e.titlos = f.ergo_titlos
+ INNER JOIN doulevei as d
+ 	ON e.titlos = d.ergo_titlos
+ INNER JOIN erevnitis as r
+ 	ON r.erevnitis_id = d.erevnitis_id
+ WHERE f.epistimoniko_pedio_onoma = 'South' and e.liksi >= '2022/6/1' and e.enarksi <= '2022/6/1'
+ */
+ 
+ ------------------------------------------------------------------------
+ ------------------------------ 3.4 -------------------------------------
+ ------------------------------------------------------------------------
+
+ -- -----------------------------------------------------
+-- Table frequency gia query 3.4
+-- -----------------------------------------------------
+DROP TABLE frequency;
+
+CREATE TABLE IF NOT EXISTS frequency AS 
+ 	SELECT organismos_onoma, extract(year from enarksi) as y, count(1) as freq
+	FROM ergo
+	GROUP BY organismos_onoma, enarksi
+	HAVING count(1)>= 1;
+ 
+ 
+
+
+ /*
+ CREATE TABLE frequency AS 
+ 	SELECT organismos_onoma, extract(year from enarksi) as y, count(1) as freq
+	FROM ergo
+	GROUP BY organismos_onoma, enarksi
+	HAVING count(1)>= 10;
+ */
+ /*
+ SELECT first.organismos_onoma 
+ FROM frequency AS first
+     INNER JOIN frequency AS second
+         ON first.organismos_onoma = second.organismos_onoma
+ WHERE first.y - second.y = 1 and first.organismos_onoma = second.organismos_onoma and first.freq = second.freq
+ */
+
+ 
+ ------------------------------------------------------------------------
+ ------------------------------ 3.5 -------------------------------------
+ ------------------------------------------------------------------------
+ /*
+ SELECT first.epistimoniko_pedio_onoma as name1, second.epistimoniko_pedio_onoma as name2, COUNT(1) as freq
+ FROM afora_pedio AS first
+     INNER JOIN afora_pedio AS second
+         ON first.ergo_titlos = second.ergo_titlos
+ WHERE first.epistimoniko_pedio_onoma < second.epistimoniko_pedio_onoma
+ GROUP BY first.epistimoniko_pedio_onoma, second.epistimoniko_pedio_onoma
+ ORDER BY COUNT(1) DESC
+ limit 3
+ */
+ ------------------------------------------------------------------------
+ ------------------------------ 3.6 -------------------------------------
+ ------------------------------------------------------------------------
+
+/*
+SELECT r.onoma as name, r.epitheto as surname, count(e.titlos) as freq, r.erevnitis_id as id
+ FROM doulevei AS d
+ 	INNER JOIN ergo AS e
+ 		ON d.ergo_titlos = e.titlos
+	INNER JOIN erevnitis AS r
+		ON d.erevnitis_id = r.erevnitis_id 
+	WHERE r.ilikia < 40 and e.liksi >= '2022/6/1' and e.enarksi <= '2022/6/1'
+	GROUP BY r.erevnitis_id
+	ORDER BY COUNT(e.titlos) DESC
+	limit 5
+*/
+
+
+ ------------------------------------------------------------------------
+ ------------------------------ 3.7 -------------------------------------
+ ------------------------------------------------------------------------
+ /*
+ SELECT s.onoma as name, e.organismos_onoma as name2, SUM(e.poso) as sinolo
+ FROM ergo as e
+ 	INNER JOIN stelexos as s
+		ON e.stelexos_id = s.stelexos_id
+	INNER JOIN eteria as c
+		ON e.organismos_onoma = c.organismos_onoma
+	GROUP BY s.stelexos_id, e.organismos_onoma
+	ORDER BY SUM(e.poso) DESC
+	limit 5
+*/
+
+ ------------------------------------------------------------------------
+ ------------------------------ 3.8 -------------------------------------
+ ------------------------------------------------------------------------
+ /*
+ SELECT r.onoma as name, r.epitheto as surname ,count(d.ergo_titlos) as freq, r.erevnitis_id as id
+ FROM doulevei AS d
+	INNER JOIN erevnitis AS r
+		ON d.erevnitis_id = r.erevnitis_id 
+	LEFT JOIN paradosi_paradoteou AS p
+		ON p.ergo_titlos = d.ergo_titlos
+	WHERE p.titlos_paradoteou is NULL
+	GROUP BY r.erevnitis_id--, d.ergo_titlos
+	HAVING count(d.ergo_titlos)>=5
+ */
