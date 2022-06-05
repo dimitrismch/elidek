@@ -1,0 +1,8 @@
+ ------------------------------------------------------------------------
+ ------------------------    INDEXES    ---------------------------------
+ ------------------------------------------------------------------------
+
+
+ CREATE INDEX idx_ilikia_erevniti ON erevnitis(ilikia);
+ CREATE INDEX idx_enarksi_ergou ON ergo(enarksi);
+ CREATE INDEX idx_liksi_ergou ON ergo(liksi);
