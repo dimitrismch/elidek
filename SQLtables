@@ -1,0 +1,181 @@
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
+
+
+CREATE OR REPLACE FUNCTION get_age( age_1 date, age_2 date)
+RETURNS int
+AS $CODE$
+BEGIN
+    RETURN EXTRACT(YEAR FROM AGE(age_2,age_1));
+END
+$CODE$
+LANGUAGE plpgsql IMMUTABLE;
+
+-- -----------------------------------------------------
+-- Table Organismos
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS Organismos (
+  Onoma VARCHAR(45) NOT NULL,
+  Sintomografia VARCHAR(10)  ,
+  TK INT ,
+  Odos VARCHAR(45),
+  Poli VARCHAR(45),
+  PRIMARY KEY (onoma))
+ ;
+
+-- -----------------------------------------------------
+-- Table Erevnitis
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS erevnitis (
+  erevnitis_id INT NOT NULL,
+  onoma VARCHAR(15) NOT NULL,
+  epitheto VARCHAR(15) NOT NULL,
+  filo VARCHAR(10) NOT NULL,
+  im_genisis DATE NOT NULL,
+  ilikia int GENERATED ALWAYS AS (get_age(im_genisis,'2022/1/1')) STORED,
+  PRIMARY KEY (erevnitis_id))
+  ;
+
+-- -----------------------------------------------------
+-- Table Tilefwna
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS Tilefwna (
+  Arithmos_Tilefwnou VARCHAR(11) NOT NULL,
+  organismos_onoma VARCHAR(45) NOT NULL,
+     PRIMARY KEY (arithmos_tilefwnou),
+     FOREIGN KEY (organismos_onoma) REFERENCES organismos(onoma))
+ ;
+
+-- -----------------------------------------------------
+-- Table Stelexos
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS Stelexos (
+  Stelexos_ID INT NOT NULL,
+  Onoma VARCHAR(45) NOT NULL,
+     PRIMARY KEY (stelexos_ID))
+ ;
+
+-- -----------------------------------------------------
+-- Table Programma
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS Programma (
+  onoma VARCHAR(45) NOT NULL,
+  Diefthinsi VARCHAR(45) NOT NULL,
+  PRIMARY KEY (onoma));
+
+-- -----------------------------------------------------
+-- Table Epistimoniko Pedio
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS Epistimoniko_Pedio (
+  Onoma VARCHAR(45) NOT NULL,
+  PRIMARY KEY (Onoma));
+
+-- -----------------------------------------------------
+-- Table Paradoteo
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS paradoteo (
+  titlos VARCHAR(45) NOT NULL,
+  perilipsi VARCHAR(120),
+  PRIMARY KEY (titlos));
+
+-- -----------------------------------------------------
+-- Table Ypalliliki Sxesi
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS Ypalliliki_Sxesi (
+Organismos_onoma VARCHAR(45) NOT NULL,
+Erevnitis_ID INT NOT NULL,
+   PRIMARY KEY (erevnitis_id),
+   FOREIGN KEY (organismos_onoma) REFERENCES organismos(onoma),
+   FOREIGN KEY (erevnitis_id) REFERENCES erevnitis(erevnitis_id))
+ ;
+
+-- -----------------------------------------------------
+-- Table Ergo
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS Ergo (
+  Titlos VARCHAR(45) NOT NULL,
+  Perilipsi VARCHAR(120) ,
+  Poso DECIMAL(10) NOT NULL,
+  Enarksi DATE NOT NULL,
+  Liksi DATE NOT NULL,
+  Stelexos_ID INT ,
+  Organismos_onoma VARCHAR(45) ,
+  Programma_Onoma VARCHAR(45) ,
+  Ypeuthinos_ID INT ,
+  Diarkeia int GENERATED ALWAYS AS (get_age(enarksi,liksi)) STORED,
+     PRIMARY KEY (titlos),
+     FOREIGN KEY (programma_onoma) REFERENCES programma(onoma),
+     FOREIGN KEY (ypeuthinos_ID) REFERENCES erevnitis(erevnitis_ID),
+     FOREIGN KEY (stelexos_ID) REFERENCES stelexos(stelexos_ID),
+     FOREIGN KEY (organismos_onoma) REFERENCES organismos(onoma));
+
+-- -----------------------------------------------------
+-- Table Afora_Pedio
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS Afora_Pedio (
+  Epistimoniko_pedio_onoma VARCHAR(45) NOT NULL,
+  Ergo_titlos VARCHAR(45) NOT NULL,
+     PRIMARY KEY (epistimoniko_pedio_onoma, ergo_titlos),
+     FOREIGN KEY (epistimoniko_pedio_onoma) REFERENCES epistimoniko_pedio(onoma),
+     FOREIGN KEY (ergo_titlos) REFERENCES ergo(titlos))
+ ;
+
+-- -----------------------------------------------------
+-- Table Paradosi Paradoteou
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS Paradosi_Paradoteou (
+  Hmerominia_Paradosis DATE,
+  ergo_titlos VARCHAR(45) NOT NULL,
+  titlos_paradoteou VARCHAR(45),
+     PRIMARY KEY (titlos_paradoteou),
+     FOREIGN KEY (ergo_titlos) REFERENCES ergo(titlos),
+     FOREIGN KEY (titlos_paradoteou) REFERENCES paradoteo(titlos));
+
+-- -----------------------------------------------------
+-- Table Axiologisi
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS Axiologisi (
+  Vathmos FLOAT NOT NULL,
+  Imerominia DATE NOT NULL,
+  Erevnitis_ID INT NOT NULL,
+  Ergo_titlos VARCHAR(45) NOT NULL,
+     PRIMARY KEY (ergo_titlos),
+     FOREIGN KEY (erevnitis_id) REFERENCES erevnitis(erevnitis_id),
+     FOREIGN KEY (ergo_titlos) REFERENCES ergo(titlos));
+
+-- -----------------------------------------------------
+-- Table Eteria
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS Eteria (
+  idia_kefalea DECIMAL(10) NOT NULL,
+  organismos_onoma VARCHAR(45) NOT NULL REFERENCES organismos(onoma))
+ ;
+ 
+-- -----------------------------------------------------
+-- Table Panepistimio
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS Panepistimio (
+  Proipologismos_yp_paidias DECIMAL(10) NOT NULL,
+  organismos_onoma VARCHAR(45) NOT NULL REFERENCES organismos(onoma))
+ ;
+ 
+-- -----------------------------------------------------
+-- Table Er_Kentro
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS Er_Kentro (
+  Proipologismos_yp_paidias DECIMAL(10) NOT NULL,
+  Proipologismos_idiotikes_draseis DECIMAL(10) NOT NULL,
+  organismos_onoma VARCHAR(45) NOT NULL REFERENCES organismos(onoma))
+ ;
+
+ 
+-- -----------------------------------------------------
+-- Table Doulevei
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS Doulevei(
+  Ergo_titlos VARCHAR(45) NOT NULL,
+  Erevnitis_ID INT NOT NULL,
+  PRIMARY KEY (erevnitis_id, ergo_titlos),
+  FOREIGN KEY (ergo_titlos) REFERENCES ergo(titlos),
+  FOREIGN KEY (erevnitis_id) REFERENCES erevnitis(erevnitis_id))
+ ;
