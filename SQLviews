@@ -1,0 +1,31 @@
+------------------------------------------------------------------------
+ --------------------------------Views  ---------------------------------
+ ------------------------------------------------------------------------
+ 
+ 
+ ------------------------------------------------------------------------
+ -------------------------------  3.2  ---------------------------------
+ ------------------------------------------------------------------------
+ 
+ /*
+ CREATE VIEW erevnites_over_60 AS 
+ 	SELECT erevnitis_id ,onoma,epitheto,ilikia
+	FROM erevnitis
+	WHERE ilikia > 60;
+ */
+ /*
+ SELECT *
+ FROM erevnites_over_60;
+ */
+ /*
+ CREATE VIEW erga_erevniti AS
+ 	SELECT r.erevnitis_id,r.onoma, r.epitheto, d.ergo_titlos
+	FROM doulevei as d
+	INNER JOIN erevnitis AS r
+		ON d.erevnitis_id = r.erevnitis_id
+	ORDER BY(d.erevnitis_id);
+ */
+ /*
+ SELECT *
+ FROM erga_erevniti
+*/
